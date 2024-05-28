@@ -6,6 +6,7 @@ Contains the TestDBStorageDocs and TestDBStorage classes
 from datetime import datetime
 import inspect
 import models
+from unittest.mock import MagicMock, patch
 from models.engine import db_storage
 from models.amenity import Amenity
 from models.base_model import BaseModel
@@ -87,3 +88,50 @@ class TestFileStorage(unittest.TestCase):
         @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
         def test_save(self):
             """Test that save properly saves objects to file.json"""
+
+
+class mydb_storage_tests:
+    """Class to test additions i've made to the db class source code"""
+
+    def setup(self):
+        """Set up test environment"""
+        self.storage = DBStorage()
+        self.storage.__session = MagicMock()
+
+    def test_get_existing_object(self):
+        """Test get method for an existing object"""
+        mock_state = State(id='123')
+        self.storage.__session.query().all.return_value = [mock_state]
+
+        result = self.storage.get(State, '123')
+        self.assertEqual(result, mock_state)
+
+    def test_get_nonexistent_object(self):
+        """Test get method for a non-existent object"""
+        self.storage.__session.query().all.return_value = []
+
+        result = self.storage.get(State, '123')
+        self.assertIsNone(result)
+
+    def test_count_all_objects(self):
+        """Test count method for all objects"""
+        mock_states = [State(id='123'), City(id='456')]
+        self.storage.__session.query().all.return_value = mock_states
+
+        result = self.storage.count()
+        self.assertEqual(result, 2)
+
+    def test_count_specific_class_objects(self):
+        """Test count method for a specific class"""
+        mock_states = [State(id='123'), State(id='456')]
+        self.storage.__session.query().all.return_value = mock_states
+
+        result = self.storage.count(State)
+        self.assertEqual(result, 2)
+
+    def test_count_specific_class_no_objects(self):
+        """Test count method for a specific class with no objects"""
+        self.storage.__session.query().all.return_value = []
+
+        result = self.storage.count(State)
+        self.assertEqual(result, 0)

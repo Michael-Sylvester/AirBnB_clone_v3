@@ -43,7 +43,7 @@ class TestFileStorageDocs(unittest.TestCase):
         result = pep8s.check_files(['tests/test_models/test_engine/\
 test_file_storage.py'])
         self.assertEqual(result.total_errors, 0,
-                         "Found code style errors (and warnings).")
+                         "Found codestyle errors (and warnings).")
 
     def test_file_storage_module_docstring(self):
         """Test for the file_storage.py module docstring"""
@@ -70,6 +70,7 @@ test_file_storage.py'])
 
 class TestFileStorage(unittest.TestCase):
     """Test the FileStorage class"""
+
     @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
     def test_all_returns_dict(self):
         """Test that all returns the FileStorage.__objects attr"""
@@ -113,3 +114,70 @@ class TestFileStorage(unittest.TestCase):
         with open("file.json", "r") as f:
             js = f.read()
         self.assertEqual(json.loads(string), json.loads(js))
+
+    def test_get_existing_object(self):
+        """Test get method for an existing object"""
+        storage = FileStorage()
+        save = FileStorage._FileStorage__objects
+
+        state = State(id='123')
+        key = f"State.123"
+        storage._FileStorage__objects[key] = state
+
+        result = storage.get(State, '123')
+        self.assertEqual(result, state)
+
+    def test_get_nonexistent_object(self):
+        """Test get method for a non-existent object"""
+        storage = FileStorage()
+        save = FileStorage._FileStorage__objects
+
+        result = storage.get(State, '1445')
+        self.assertIsNone(result)
+
+    def test_count_all_objects(self):
+        """Test count method for all objects"""
+        storage = FileStorage()
+        save = FileStorage._FileStorage__objects
+
+        state1 = State(id='123')
+        state2 = State(id='456')
+        city = City(id='789')
+        storage._FileStorage__objects = {
+            "State.123": state1,
+            "State.456": state2,
+            "City.789": city
+        }
+
+        result = storage.count()
+        self.assertEqual(result, 3)
+
+        def test_count_specific_class_objects(self):
+            """Test count method for a specific class"""
+            storage = FileStorage()
+            save = FileStorage._FileStorage__objects
+
+            state1 = State(id='123')
+            state2 = State(id='456')
+            city = City(id='789')
+            storage._FileStorage__objects = {
+                "State.123": state1,
+                "State.456": state2,
+                "City.789": city
+            }
+
+            result = storage.count(State)
+            self.assertEqual(result, 2)
+
+        def test_count_specific_class_no_objects(self):
+            """Test count method for a specific class with no objects"""
+            storage = FileStorage()
+            save = FileStorage._FileStorage__object
+
+            city = City(id='789')
+            storage._FileStorage__objects = {
+                "City.789": city
+            }
+
+            result = storage.count(State)
+            self.assertEqual(result, 0)
