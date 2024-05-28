@@ -8,14 +8,18 @@ from api.v1.views import app_views
 app = Flask()
 app.register_blueprint(app_views)
 
+
 @app.route('/')
 def hello_world():
-    """"""
+    """root response"""
     return 'Hello world'
+
 
 @app.teardown_appcontext
 def teardown(exception):
+    """Operation to be called at the end of each request"""
     storage.close()
+
 
 if __name__ == '__main__':
     import os
