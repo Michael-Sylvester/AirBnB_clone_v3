@@ -26,6 +26,7 @@ def handle_404(e):
     """Handle 404 errors for pages not found"""
     return jsonify({"error": "Not found"})
 
+
 if __name__ == '__main__':
     import os
 
