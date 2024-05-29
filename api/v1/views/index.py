@@ -21,3 +21,7 @@ def view_stats():
     for index in range(0, len(classes)):
         count_obj[classes[index]] = storage.count(classes[index])
     return count_obj
+
+@app_views.errorhandler(404)
+def handle_404(e):
+    return jsonify({"error": "Not found"})
