@@ -5,22 +5,23 @@ from flask import jsonify, abort, request
 from models import storage
 from models.state import State
 
-@app_views.route('/states', methodes=['GET'], strict_slashes=False)
+@app_views.route('/states', methods=['GET'], strict_slashes=False)
 def get_states():
     """Returns all state objects"""
     states = storage.all(State).values()
     return jsonify([state.to_dict() for state in states])
 
-@app_views.route('/states/<stats_id>', methodes=['POST'], strict_slashes=False)
+
+@app_views.route('/states/<state_id>', methods=['GET'], strict_slashes=False)
 def get_state_obj(state_id):
     """Returns a state object based on id"""
     state = storage.get(State, state_id)
-    if State is None:
+    if state is None:
         abort (404)
     return jsonify(state.to_dict())
 
 
-@app_views.route('/states/<stats_id>', methodes=['DELETE'], strict_slashes=False)
+@app_views.route('/states/<stats_id>', methods=['DELETE'], strict_slashes=False)
 def delete_state(state_id):
     """Delete a state object"""
     state = storage.get(State, state_id)
